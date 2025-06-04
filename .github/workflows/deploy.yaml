@@ -43,7 +43,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             # Save current running image tag (without registry prefix)
-            echo $DOCKER_SERVICE_NAME
+            echo ${DOCKER_SERVICE_NAME}
             current_tag=$(docker service inspect $DOCKER_SERVICE_NAME --format '{{index .Spec.TaskTemplate.ContainerSpec.Image}}' | awk -F: '{print $2}')
             echo "$current_tag" > $LAST_IMAGE_FILE
 
