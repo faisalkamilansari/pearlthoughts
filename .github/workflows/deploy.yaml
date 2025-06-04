@@ -32,6 +32,8 @@ jobs:
 
       - name: Build and push Docker image
         run: |
+          docker system prune -a
+          docker image prune -a
           docker build -t $IMAGE_NAME:$IMAGE_TAG .
           docker push $IMAGE_NAME:$IMAGE_TAG
 
