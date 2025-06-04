@@ -14,7 +14,7 @@ jobs:
       IMAGE_TAG: ${{ github.sha }}
       SSH_HOST: 75.101.138.124
       SSH_USER: ubuntu
-      DOCKER_SERVICE_NAME: your-swarm-service-name
+      DOCKER_SERVICE_NAME: yii2_yii2-app
       LAST_IMAGE_FILE: /tmp/last_successful_image.txt
 
     steps:
