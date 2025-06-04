@@ -2,16 +2,22 @@ version: "3.9"
 
 services:
   yii2-app:
-    image: faisalkamil/yii:latest
+    image: faisalkamil/yii2:v1.0.27
     ports:
       - target: 80
         published: 8080
         protocol: tcp
-        mode: ingress  # Enables swarm ingress load balancing
+        mode: ingress
     deploy:
       replicas: 2
       restart_policy:
         condition: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
     networks:
       - yii-network
 
