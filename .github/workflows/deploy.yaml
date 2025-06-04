@@ -30,10 +30,10 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and push Docker image
-        run: |
-          docker build -t $IMAGE_NAME:$IMAGE_TAG .
-          docker push $IMAGE_NAME:$IMAGE_TAG
+      # - name: Build and push Docker image
+      #   run: |
+      #     docker build -t $IMAGE_NAME:$IMAGE_TAG .
+      #     docker push $IMAGE_NAME:$IMAGE_TAG
 
       - name: Deploy to Docker Swarm via SSH
         uses: appleboy/ssh-action@v0.1.7
@@ -43,6 +43,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             # Save current running image tag (without registry prefix)
+            echo $DOCKER_SERVICE_NAME
             current_tag=$(docker service inspect $DOCKER_SERVICE_NAME --format '{{index .Spec.TaskTemplate.ContainerSpec.Image}}' | awk -F: '{print $2}')
             echo "$current_tag" > $LAST_IMAGE_FILE
 
