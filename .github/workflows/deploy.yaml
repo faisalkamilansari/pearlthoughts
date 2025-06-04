@@ -1,4 +1,4 @@
-name: CI/CD Docker Swarm Deploy
+name: CI/CD Docker Swarm Deploy - PearlThoughts
 
 on:
   push:
