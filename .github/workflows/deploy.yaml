@@ -49,17 +49,8 @@ jobs:
           script: |
             sed -i "s|image: .*|image: $IMAGE_NAME:$IMAGE_TAG|" docker-compose.yaml
             sudo docker stack deploy -c docker-compose.yaml yii2 --detach=false
-          # script: |
-          #   # Save current running image tag (without registry prefix)
-          #   echo ${DOCKER_SERVICE_NAME}
-          #   current_tag=$(sudo docker service inspect $DOCKER_SERVICE_NAME --format '{{index .Spec.TaskTemplate.ContainerSpec.Image}}' | awk -F: '{print $2}')
-          #   echo "$current_tag" > $LAST_IMAGE_FILE
-
-          #   # Pull new image
-          #   sudo docker pull $IMAGE_NAME:$IMAGE_TAG
-
-          #   # Update service to new image
-          #   sudo docker service update --image $IMAGE_NAME:$IMAGE_TAG $DOCKER_SERVICE_NAME
+            current_tag=$(sudo docker service inspect $DOCKER_SERVICE_NAME --format '{{index .Spec.TaskTemplate.ContainerSpec.Image}}' | awk -F: '{print $2}')
+            echo "$current_tag" > $LAST_IMAGE_FILE
 
       - name: Rollback on failure
         if: failure()
