@@ -65,5 +65,5 @@ jobs:
               echo "Rolling back to previous image tag: $last_tag"
               docker service update --image $IMAGE_NAME:$last_tag $DOCKER_SERVICE_NAME
             else
-              echo "No previous image tag found, rollback skipped."
+              echo "No previous image tag found, rollback skipped. Added"
             fi
