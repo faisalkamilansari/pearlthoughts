@@ -48,7 +48,7 @@ jobs:
           envs: IMAGE_NAME,IMAGE_TAG,DOCKER_SERVICE_NAME
           script: |
             sed -i "s|image: .*|image: $IMAGE_NAME:$IMAGE_TAG|" docker-compose.yaml
-            docker stack deploy -c docker-compose.yaml yii2
+            sudo docker stack deploy -c docker-compose.yaml yii2 --detach=false
           # script: |
           #   # Save current running image tag (without registry prefix)
           #   echo ${DOCKER_SERVICE_NAME}
