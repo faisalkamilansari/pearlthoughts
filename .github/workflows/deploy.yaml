@@ -48,9 +48,10 @@ jobs:
           envs: IMAGE_NAME,IMAGE_TAG,DOCKER_SERVICE_NAME
           script: |
             sed -i "s|image: .*|image: $IMAGE_NAME:$IMAGE_TAG|" docker-compose.yaml
-            sudo docker stack deploy -c docker-compose.yaml yii2 --detach=false
-            current_tag=$(sudo docker service inspect $DOCKER_SERVICE_NAME --format '{{index .Spec.TaskTemplate.ContainerSpec.Image}}' | awk -F: '{print $2}')
+            current_tag=$(sudo docker service inspect yii2_yii2-app --format '{{index .Spec.TaskTemplate.ContainerSpec.Image}}' | awk -F: '{print $2}')
             echo "$current_tag" > $LAST_IMAGE_FILE
+            sudo docker stack deploy -c docker-compose.yaml yii2 --detach=false
+
 
       - name: Rollback on failure
         if: failure()
