@@ -1,0 +1,69 @@
+name: CI/CD Docker Swarm Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      IMAGE_NAME: faisalkamil/yii2
+      IMAGE_TAG: ${{ github.sha }}
+      SSH_HOST: ec2-your-server-ip
+      SSH_USER: ec2-user
+      DOCKER_SERVICE_NAME: your-swarm-service-name
+      LAST_IMAGE_FILE: /tmp/last_successful_image.txt
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t $IMAGE_NAME:$IMAGE_TAG .
+          docker push $IMAGE_NAME:$IMAGE_TAG
+
+      - name: Deploy to Docker Swarm via SSH
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ env.SSH_HOST }}
+          username: ${{ env.SSH_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            # Save current running image tag (without registry prefix)
+            current_tag=$(docker service inspect $DOCKER_SERVICE_NAME --format '{{index .Spec.TaskTemplate.ContainerSpec.Image}}' | awk -F: '{print $2}')
+            echo "$current_tag" > $LAST_IMAGE_FILE
+
+            # Pull new image
+            docker pull $IMAGE_NAME:$IMAGE_TAG
+
+            # Update service to new image
+            docker service update --image $IMAGE_NAME:$IMAGE_TAG $DOCKER_SERVICE_NAME
+
+      - name: Rollback on failure
+        if: failure()
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ env.SSH_HOST }}
+          username: ${{ env.SSH_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            if [ -f $LAST_IMAGE_FILE ]; then
+              last_tag=$(cat $LAST_IMAGE_FILE)
+              echo "Rolling back to previous image tag: $last_tag"
+              docker service update --image $IMAGE_NAME:$last_tag $DOCKER_SERVICE_NAME
+            else
+              echo "No previous image tag found, rollback skipped."
+            fi
