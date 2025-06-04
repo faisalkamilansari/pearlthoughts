@@ -47,8 +47,8 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           envs: IMAGE_NAME,IMAGE_TAG,DOCKER_SERVICE_NAME
           script: |
-            sed -i "s|image: .*|image: $IMAGE_NAME:$IMAGE_TAG|" docker-compose.yml
-            docker stack deploy -c docker-compose.yml yii2
+            sed -i "s|image: .*|image: $IMAGE_NAME:$IMAGE_TAG|" docker-compose.yaml
+            docker stack deploy -c docker-compose.yaml yii2
           # script: |
           #   # Save current running image tag (without registry prefix)
           #   echo ${DOCKER_SERVICE_NAME}
