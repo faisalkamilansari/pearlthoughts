@@ -5,7 +5,7 @@ services:
     image: yii:latest
     ports:
       - target: 80
-        published: 5000
+        published: 8080
         protocol: tcp
         mode: ingress  # Enables swarm ingress load balancing
     deploy:
