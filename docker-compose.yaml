@@ -1,0 +1,20 @@
+version: "3.9"
+
+services:
+  yii2-app:
+    image: yii:latest
+    ports:
+      - target: 80
+        published: 5000
+        protocol: tcp
+        mode: ingress  # Enables swarm ingress load balancing
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+    networks:
+      - yii-network
+
+networks:
+  yii-network:
+    driver: overlay
