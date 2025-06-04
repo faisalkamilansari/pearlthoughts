@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   yii2-app:
-    image: yii:latest
+    image: faisalkamil/yii:latest
     ports:
       - target: 80
         published: 8080
