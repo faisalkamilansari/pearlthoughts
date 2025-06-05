@@ -1,0 +1,25 @@
+---
+- name: Nginx, Git, PHP dependencies
+  hosts: all
+  become: yes
+  vars:
+    yii2_repo: "https://github.com/faisalkamilansari/pearlthoughts.git"
+    app_dir: "/opt/yii2-app"
+    nginx_conf_path: "/etc/nginx/sites-available/yii2-app"
+    nginx_conf_link: "/etc/nginx/sites-enabled/yii2-app"
+    yii2_service_name: "yii2-app"
+    swarm_initialized: false  # will set to true after init
+
+  tasks:
+
+  - name: Install required packages for nginx & php
+    apt:
+      name: "{{ item }}"
+      state: present
+      update_cache: yes
+    loop:
+      - nginx
+      - git
+      - php
+      - php-cli
+      - php-fpm

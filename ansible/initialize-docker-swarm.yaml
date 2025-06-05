@@ -1,0 +1,15 @@
+- name: Initialize Docker Swarm
+  hosts: all
+  become: yes
+  vars:
+    swarm_initialized: false  # will set to true after init
+
+  tasks:
+
+  - name: Initialize Docker Swarm (only on first host)
+    command: docker swarm init
+    register: swarm_init
+    failed_when: false
+    changed_when: "'This node is already part of a swarm' not in swarm_init.stderr"
+    when: inventory_hostname == groups['all'][0]
+    tags: swarm

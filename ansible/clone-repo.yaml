@@ -1,0 +1,13 @@
+- name: Clone repo playbook
+  hosts: all
+  become: yes
+  vars:
+    yii2_repo: "https://github.com/faisalkamilansari/pearlthoughts.git"
+    app_dir: "/opt/yii2-app"
+  tasks:
+  - name: Clone Yii2 repo
+    git:
+      repo: "{{ yii2_repo }}"
+      dest: "{{ app_dir }}"
+      update: yes
+    tags: app

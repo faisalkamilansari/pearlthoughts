@@ -1,0 +1,42 @@
+- name: Setup Nginx
+  hosts: all
+  become: yes
+  vars:
+    nginx_conf_path: "/etc/nginx/sites-available/yii2-app"
+    nginx_conf_link: "/etc/nginx/sites-enabled/yii2-app"
+  tasks:
+  - name: Create NGINX config for Yii2 app
+    copy:
+      dest: "{{ nginx_conf_path }}"
+      content: |
+        server {
+          listen 80;
+          server_name _;
+          location / {
+            proxy_pass http://localhost:8080;  # assuming your app runs on 8080
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+          }
+        }
+    tags: nginx
+
+  - name: Enable NGINX site
+    file:
+      src: "{{ nginx_conf_path }}"
+      dest: "{{ nginx_conf_link }}"
+      state: link
+    tags: nginx
+
+  - name: Remove default NGINX site
+    file:
+      path: /etc/nginx/sites-enabled/default
+      state: absent
+    tags: nginx
+
+  - name: Restart NGINX
+    systemd:
+      name: nginx
+      state: restarted
+    tags: nginx

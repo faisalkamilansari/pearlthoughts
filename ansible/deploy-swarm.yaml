@@ -1,0 +1,10 @@
+- name: Deploy Swarm Application
+  hosts: all
+  become: yes
+  tasks:
+    - name: Deploy Yii2 stack from docker-compose.yaml
+    command: docker stack deploy -c docker-compose.yaml yii2
+    args:
+      chdir: /opt/yii2-app
+    become: true
+    tags: deploy

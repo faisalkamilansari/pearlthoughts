@@ -1,0 +1,69 @@
+---
+- name: Docker & Docker-Compose Installation
+  hosts: all
+  become: yes
+  tasks:
+
+  - name: Install required packages for Docker
+    apt:
+      name: "{{ item }}"
+      state: present
+      update_cache: yes
+    loop:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg-agent
+      - software-properties-common
+      - git
+      - nginx
+      - php
+      - php-cli
+      - php-fpm
+    tags: docker_dependencies
+
+  - name: Create keyrings directory
+    file:
+      path: /etc/apt/keyrings
+      state: directory
+      mode: '0755'
+
+  - name: Download Docker GPG key using curl
+    become: true
+    shell: |
+      curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+      chmod a+r /etc/apt/keyrings/docker.asc
+
+  - name: Add Docker repository
+    apt_repository:
+      repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+      state: present
+      filename: docker
+
+  - name: Install Docker Engine
+    apt:
+      name: docker-ce
+      state: present
+      update_cache: yes
+    tags: docker
+
+  - name: Install Docker Compose
+    get_url:
+      url: https://github.com/docker/compose/releases/download/v2.18.1/docker-compose-linux-x86_64
+      dest: /usr/local/bin/docker-compose
+      mode: '0755'
+    tags: docker
+
+  - name: Ensure Docker service is started and enabled
+    systemd:
+      name: docker
+      state: started
+      enabled: yes
+    tags: docker
+
+  - name: Add current user to docker group
+    user:
+      name: "{{ ansible_user }}"
+      groups: docker
+      append: yes
+    tags: docker
