@@ -129,10 +129,8 @@
   - name: Initialize Docker Swarm (if not already initialized)
     shell: |
       (docker info | grep -q 'Swarm: active' ) || docker swarm init --advertise-addr 192.168.100.202
-    #args:
-    #  warn: false
     become: true
-    #tags: swarm
+    tags: swarm
   - name: Deploy Yii2 stack from docker-compose.yaml
     command: docker stack deploy -c docker-compose.yaml yii2
     args:
